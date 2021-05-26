@@ -1,5 +1,3 @@
-package editor;
-
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -12,51 +10,27 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class TextEditor extends JFrame {
-    final File[] file = {null};
-    JTextArea textArea = new JTextArea();
-    JScrollPane scrollPane = new JScrollPane(textArea);
+    private final File[] file = {null};
+    private final JTextArea textArea = new JTextArea();
+    private final JScrollPane scrollPane = new JScrollPane(textArea);
 
-    JMenuItem open = new JMenuItem("Open");
-    JMenuItem save = new JMenuItem("Save");
-    JMenuItem exit = new JMenuItem("Exit");
-    JMenu menu = new JMenu("File");
+    private final JMenuItem open = new JMenuItem("Open");
+    private final JMenuItem save = new JMenuItem("Save");
+    private final JMenuItem exit = new JMenuItem("Exit");
+    private final JMenu menu = new JMenu("File");
 
-    JMenuItem startSearch = new JMenuItem("Start search");
-    JMenuItem previousMatch = new JMenuItem("Previous match");
-    JMenuItem nextMatch = new JMenuItem("Next match");
-    JMenuItem useRegex = new JMenuItem("Use regex");
-    JMenu searchMenu = new JMenu("Search");
+    private final JMenuItem find = new JMenuItem("Find");
+    private final JMenuItem findAndReplace = new JMenuItem("Find and Replace");
+    private final JMenu searchMenu = new JMenu("Search");
 
-    JMenuBar menuBar = new JMenuBar();
+    private final JMenuItem appearance = new JMenuItem("Appearance");
+    private final JMenu settings = new JMenu("Settings");
 
-    ImageIcon openImage = new ImageIcon("/home/stellarloony/Pictures/openIcon.png", "Open");
-    ImageIcon saveImage = new ImageIcon("/home/stellarloony/Pictures/saveIcon.png", "Save");
-    ImageIcon searchIcon = new ImageIcon("/home/stellarloony/Pictures/searchIcon.png", "Search");
-    ImageIcon nextIcon = new ImageIcon("/home/stellarloony/Pictures/nextIcon.png", "Next");
-    ImageIcon prevIcon = new ImageIcon("/home/stellarloony/Pictures/prevIcon.png", "Previous");
+    private final JMenuBar menuBar = new JMenuBar();
 
-    JButton saveButton = new JButton(saveImage);
-    JButton openButton = new JButton(openImage);
-    JTextField searchString = new JTextField();
-    JCheckBox checkBox = new JCheckBox("Use regex");
-    JButton searchButton = new JButton(searchIcon);
-    JButton nextButton = new JButton(nextIcon);
-    JButton prevButton = new JButton(prevIcon);
-
-    JToolBar toolBar = new JToolBar();
-
-
-    Map<Integer, Integer> foundText;
-    Object[] startIndex;
-    Object[] length;
-    int index;
-
-    Action openFileChooser = new AbstractAction() {
+    private final Action openFileChooser = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             JFileChooser fileChooser = new JFileChooser();
@@ -73,7 +47,7 @@ public class TextEditor extends JFrame {
         }
     };
 
-    Action writeToFile = new AbstractAction() {
+    private final Action writeToFile = new AbstractAction() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             try (PrintWriter writer = new PrintWriter(file[0])){
@@ -82,41 +56,6 @@ public class TextEditor extends JFrame {
                 System.out.println("File access error!");
                 e.printStackTrace();
             }
-        }
-    };
-
-    Action search = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            foundText = new LinkedHashMap<>();
-            index = 0;
-            Thread t = new Thread(() -> new Search(searchString.getText(), textArea.getText(),
-                    checkBox.isSelected(), foundText).doSearch());
-            t.start();
-            try {
-                t.join();
-                startIndex = foundText.keySet().toArray();
-                length =  foundText.values().toArray();
-                selectString((int) startIndex[index], (int) length[index]);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    };
-
-    Action next = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            index = ++index > startIndex.length - 1 ? 0 : index;
-            selectString((int) startIndex[index], (int) length[index]);
-        }
-    };
-
-    Action previous = new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-            index = --index < 0 ? startIndex.length - 1 : index;
-            selectString((int) startIndex[index], (int) length[index]);
         }
     };
 
@@ -135,29 +74,29 @@ public class TextEditor extends JFrame {
     void initComponents() {
         setMargin(textArea, 20, 10, 20, 10);
         textArea.setName("TextArea");
-        Font font = new Font("Courier", Font.PLAIN, 16);
-        textArea.setFont(font);
+        textArea.setFont(new Font("Serif", Font.PLAIN, 18));
 
-        setMargin(scrollPane, 10, 0, 10, 0);
         scrollPane.setName("ScrollPane");
 
         add(scrollPane, BorderLayout.CENTER);
 
-        initToolBar();
         initMenuBar();
     }
 
     void initMenuBar() {
         open.addActionListener(openFileChooser);
         open.setMnemonic(KeyEvent.VK_O);
+        open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK));
         open.setName("MenuOpen");
 
         save.addActionListener(writeToFile);
         save.setMnemonic(KeyEvent.VK_S);
+        save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
         save.setName("MenuSave");
 
         exit.addActionListener(actionEvent -> System.exit(0));
         exit.setMnemonic(KeyEvent.VK_E);
+        exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.ALT_DOWN_MASK));
         exit.setName("MenuExit");
 
         menu.setMnemonic(KeyEvent.VK_F);
@@ -167,71 +106,28 @@ public class TextEditor extends JFrame {
         menu.addSeparator();
         menu.add(exit);
 
-        startSearch.setMnemonic(KeyEvent.VK_S);
-        startSearch.addActionListener(search);
-        startSearch.setName("MenuStartSearch");
+        find.setMnemonic(KeyEvent.VK_F);
+        find.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_DOWN_MASK));
+        find.addActionListener(actionEvent -> new Find(textArea));
 
-        previousMatch.setMnemonic(KeyEvent.VK_P);
-        previousMatch.addActionListener(previous);
-        previousMatch.setName("MenuPreviousMatch");
-
-        nextMatch.setMnemonic(KeyEvent.VK_N);
-        nextMatch.addActionListener(next);
-        nextMatch.setName("MenuNextMatch");
-
-        useRegex.setMnemonic(KeyEvent.VK_R);
-        useRegex.addActionListener(actionEvent -> checkBox.setSelected(true));
-        useRegex.setName("MenuUseRegExp");
+        findAndReplace.setMnemonic(KeyEvent.VK_R);
+        findAndReplace.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK));
+        findAndReplace.addActionListener(actionEvent -> new FindAndReplace(textArea));
 
         searchMenu.setMnemonic(KeyEvent.VK_S);
         searchMenu.setName("MenuSearch");
-        searchMenu.add(startSearch);
-        searchMenu.add(previousMatch);
-        searchMenu.add(nextMatch);
-        searchMenu.add(useRegex);
+        searchMenu.add(find);
+        searchMenu.add(findAndReplace);
+
+        appearance.addActionListener(actionEvent -> new Appearance(textArea));
+        appearance.setMnemonic(KeyEvent.VK_A);
+        settings.setMnemonic(KeyEvent.VK_T);
+        settings.add(appearance);
 
         menuBar.add(menu);
         menuBar.add(searchMenu);
+        menuBar.add(settings);
         setJMenuBar(menuBar);
-    }
-
-    void initToolBar() {
-
-        saveButton.addActionListener(writeToFile);
-        saveButton.setToolTipText("Save");
-        saveButton.setName("SaveButton");
-
-        openButton.addActionListener(openFileChooser);
-        openButton.setToolTipText("Open");
-        openButton.setName("OpenButton");
-
-        searchString.setToolTipText("Search field");
-        searchString.setName("SearchField");
-
-        checkBox.setName("UseRegExCheckbox");
-
-        searchButton.addActionListener(search);
-        searchButton.setToolTipText("Search");
-        searchButton.setName("StartSearchButton");
-
-        nextButton.addActionListener(next);
-        nextButton.setToolTipText("Next match");
-        nextButton.setName("NextMatchButton");
-
-        prevButton.addActionListener(previous);
-        prevButton.setToolTipText("Previous Match");
-        prevButton.setName("PreviousMatchButton");
-
-        toolBar.add(openButton);
-        toolBar.add(saveButton);
-        toolBar.addSeparator();
-        toolBar.add(searchString);
-        toolBar.add(searchButton);
-        toolBar.add(prevButton);
-        toolBar.add(nextButton);
-        toolBar.add(checkBox);
-
-        add(toolBar, BorderLayout.NORTH);
     }
 
     public static String readFile(String filename) throws IOException {
@@ -245,36 +141,5 @@ public class TextEditor extends JFrame {
                 aBottom, aRight));
         aComponent.setBorder(border == null ? marginBorder
                 : new CompoundBorder(marginBorder, border));
-    }
-
-    public void selectString(int iStart, int iLength) {
-        System.out.println(iStart + " -> " + iLength);
-        textArea.setCaretPosition(iStart + iLength);
-        textArea.select(iStart, iStart + iLength);
-        textArea.grabFocus();
-    }
-
-}
-
-class Search {
-    String regex;
-    String fileText;
-    boolean useRegex;
-    Map<Integer, Integer> foundText;
-
-    public Search(String regex, String fileText, boolean useRegex, Map<Integer, Integer> foundText) {
-        this.regex = regex;
-        this.fileText = fileText;
-        this.useRegex = useRegex;
-        this.foundText = foundText;
-    }
-
-    void doSearch() {
-        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(fileText);
-
-        while (matcher.find()) {
-            foundText.put(matcher.start(), matcher.group().length());
-        }
     }
 }
