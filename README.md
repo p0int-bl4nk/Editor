@@ -1,4 +1,4 @@
-# Text_Editor
+# Text Editor
 A basic text editor, using Swing
 
 
