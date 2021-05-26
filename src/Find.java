@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2021. Sachin Verma
+ * All rights reserved
+ *
+ */
+
 import javax.swing.*;
 
 public class Find extends JFrame {
