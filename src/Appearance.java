@@ -45,9 +45,9 @@ public class Appearance extends JFrame{
         cancelButton.addActionListener(actionEvent -> dispose());
 
         chooseColorFontButton.addActionListener(actionEvent -> fontColor = JColorChooser.showDialog(this,
-                "Choose a color", fontColor));
+                "Choose a font color", fontColor));
         chooseColorBackgroundButton.addActionListener(actionEvent -> backgroundColor = JColorChooser.showDialog(this,
-                "Choose a color", backgroundColor));
+                "Choose a background color", backgroundColor));
 
         setVisible(true);
     }
