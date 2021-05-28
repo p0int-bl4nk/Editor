@@ -11,11 +11,15 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Scanner;
 
 public class TextEditor extends JFrame {
     private final File[] file = {null};
@@ -35,6 +39,17 @@ public class TextEditor extends JFrame {
     private final JMenu settings = new JMenu("Settings");
 
     private final JMenuBar menuBar = new JMenuBar();
+
+    private final File configFile = new File(".config");
+    private int fontSize;
+    private String fontFamily;
+    private Color fontColor;
+    private Color backgroundColor;
+    private int width;
+    private int height;
+    private int x;
+    private int y;
+
 
     private final Action openFileChooser = new AbstractAction() {
         @Override
@@ -65,22 +80,104 @@ public class TextEditor extends JFrame {
         }
     };
 
-
     public TextEditor() {
         super("Text Editor");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 500);
-        setLocationRelativeTo(null);
+        getUserConfig();
+        setBounds(x, y, width, height);
 
         initComponents();
-
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                writeUserConfig();
+            }
+        });
         setVisible(true);
     }
 
-    void initComponents() {
+    private void writeUserConfig() {
+        try (PrintWriter writer = new PrintWriter(configFile)) {
+            writer.println("Size " + textArea.getFont().getSize());
+            writer.println("Family " + textArea.getFont().getFamily());
+            writer.println("Color " + textArea.getForeground().getRed() + " " + textArea.getForeground().getGreen()
+                    + " " + textArea.getForeground().getBlue());
+            writer.println("BackgroundColor " + textArea.getBackground().getRed() + " " +
+                    textArea.getBackground().getGreen() + " " + textArea.getBackground().getBlue());
+            writer.println("Width " + this.getWidth());
+            writer.println("Height " + this.getHeight());
+            writer.println("X " + this.getX());
+            writer.println("Y " + this.getY());
+        } catch (FileNotFoundException fileNotFoundException) {
+            System.out.println("Error writing user configuration file!");
+            fileNotFoundException.printStackTrace();
+        }
+    }
+
+    private void getUserConfig() {
+        try (Scanner scanner = new Scanner(configFile)) {
+            while (scanner.hasNextLine()) {
+                String input = scanner.nextLine();
+                String setting = input.substring(0, input.indexOf(" ") + 1);
+                String fromFile = input.replace(setting, "");
+                //System.out.println(fromFile + " " + setting);
+                int r;
+                int g;
+                int b;
+                switch (setting.trim()) {
+                    case "Size":
+                        fontSize = Integer.parseInt(fromFile);
+                        break;
+                    case "Family":
+                        fontFamily = fromFile;
+                        break;
+                    case "Color":
+                        r = Integer.parseInt(fromFile.split(" ")[0]);
+                        g = Integer.parseInt(fromFile.split(" ")[1]);
+                        b = Integer.parseInt(fromFile.split(" ")[2]);
+                        fontColor = new Color(r, g, b);
+                        break;
+                    case "BackgroundColor":
+                        r = Integer.parseInt(fromFile.split(" ")[0]);
+                        g = Integer.parseInt(fromFile.split(" ")[1]);
+                        b = Integer.parseInt(fromFile.split(" ")[2]);
+                        backgroundColor = new Color(r, g, b);
+                        break;
+                    case "Width":
+                        width = Integer.parseInt(fromFile);
+                    case "Height":
+                        height = Integer.parseInt(fromFile);
+                        break;
+                    case "X":
+                        x = Integer.parseInt(fromFile);
+                        break;
+                    case "Y":
+                        y = Integer.parseInt(fromFile);
+                        break;
+                    default:
+                        System.out.println("IllegalChoice!");
+                        break;
+                }
+            }
+        } catch (FileNotFoundException e) {
+            fontSize = 18;
+            fontColor = Color.BLACK;
+            fontFamily = "Serif";
+            backgroundColor = Color.white;
+            width = 1000;
+            height = 500;
+            x = 460;
+            y = 290;
+            e.printStackTrace();
+        }
+    }
+
+    private void initComponents() {
         setMargin(textArea, 20, 10, 20, 10);
         textArea.setName("TextArea");
-        textArea.setFont(new Font("Serif", Font.PLAIN, 18));
+        textArea.setFont(new Font(fontFamily, Font.PLAIN, fontSize));
+        textArea.setForeground(fontColor);
+        textArea.setBackground(backgroundColor);
 
         scrollPane.setName("ScrollPane");
 
@@ -89,7 +186,7 @@ public class TextEditor extends JFrame {
         initMenuBar();
     }
 
-    void initMenuBar() {
+    private void initMenuBar() {
         open.addActionListener(openFileChooser);
         open.setMnemonic(KeyEvent.VK_O);
         open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK));
@@ -100,7 +197,10 @@ public class TextEditor extends JFrame {
         save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
         save.setName("MenuSave");
 
-        exit.addActionListener(actionEvent -> System.exit(0));
+        exit.addActionListener(actionEvent -> {
+            writeUserConfig();
+            System.exit(0);
+        });
         exit.setMnemonic(KeyEvent.VK_E);
         exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.ALT_DOWN_MASK));
         exit.setName("MenuExit");

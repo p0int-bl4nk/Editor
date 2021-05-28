@@ -17,6 +17,8 @@ public class Appearance extends JFrame{
     private JButton previewButton;
     private JButton chooseColorFontButton;
     private JButton chooseColorBackgroundButton;
+    private JTextPane fontColorTextPane;
+    private JTextPane backgroundColorTextPane;
     private Color fontColor;
     private Color backgroundColor;
 
@@ -26,11 +28,22 @@ public class Appearance extends JFrame{
         setContentPane(contentPane);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
+        setResizable(false);
         addFontFamilies();
         addFontSizes();
 
         fontColor = textArea.getForeground();
         backgroundColor = textArea.getBackground();
+
+        fontColorTextPane.setBackground(fontColor);
+        backgroundColorTextPane.setBackground(backgroundColor);
+
+        theQuickBrownFoxTextPane.setBackground(backgroundColor);
+        theQuickBrownFoxTextPane.setForeground(fontColor);
+        theQuickBrownFoxTextPane.setFont(textArea.getFont());
+
+        fontSizeComboBox.setSelectedItem(textArea.getFont().getSize());
+        fontFamilyComboBox.setSelectedItem(textArea.getFont().getFamily());
 
         OKButton.addActionListener(actionEvent -> {
             textArea.setFont(new Font(String.valueOf(fontFamilyComboBox.getSelectedItem()),
@@ -50,21 +63,27 @@ public class Appearance extends JFrame{
         });
         cancelButton.addActionListener(actionEvent -> dispose());
 
-        chooseColorFontButton.addActionListener(actionEvent -> fontColor = JColorChooser.showDialog(this,
-                "Choose a font color", fontColor));
-        chooseColorBackgroundButton.addActionListener(actionEvent -> backgroundColor = JColorChooser.showDialog(this,
-                "Choose a background color", backgroundColor));
+        chooseColorFontButton.addActionListener(actionEvent -> {
+            fontColor = JColorChooser.showDialog(this,
+                    "Choose a font color", fontColor);
+            fontColorTextPane.setBackground(fontColor);
+        });
+        chooseColorBackgroundButton.addActionListener(actionEvent -> {
+            backgroundColor = JColorChooser.showDialog(this,
+                    "Choose a background color", backgroundColor);
+            backgroundColorTextPane.setBackground(backgroundColor);
+        });
 
         setVisible(true);
     }
 
-    void addFontFamilies() {
+    private void addFontFamilies() {
         for (String family : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()) {
             fontFamilyComboBox.addItem(family);
         }
     }
 
-    void addFontSizes() {
+    private void addFontSizes() {
         for (int i = 10; i <= 60; i += 2) {
             fontSizeComboBox.addItem(i);
         }

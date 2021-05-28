@@ -12,7 +12,7 @@
           <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
             <preferred-size width="200" height="200"/>
           </grid>
-          <gridbag weightx="0.0" weighty="0.0" ipadx="100" ipady="50"/>
+          <gridbag weightx="0.0" weighty="0.0" ipadx="50" ipady="50"/>
         </constraints>
         <properties>
           <resizeWeight value="0.5"/>
@@ -95,15 +95,6 @@
                   <text value="Font Color"/>
                 </properties>
               </component>
-              <component id="19b9c" class="javax.swing.JButton" binding="chooseColorFontButton">
-                <constraints>
-                  <grid row="4" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                  <gridbag weightx="0.0" weighty="0.0"/>
-                </constraints>
-                <properties>
-                  <text value="Choose Color..."/>
-                </properties>
-              </component>
               <component id="cf486" class="javax.swing.JLabel">
                 <constraints>
                   <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -119,16 +110,81 @@
                   <gridbag weightx="0.0" weighty="0.0"/>
                 </constraints>
               </vspacer>
-              <component id="721f9" class="javax.swing.JButton" binding="chooseColorBackgroundButton">
+              <grid id="f990a" layout-manager="GridBagLayout">
                 <constraints>
-                  <grid row="6" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <grid row="4" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                   <gridbag weightx="0.0" weighty="0.0"/>
                 </constraints>
-                <properties>
-                  <hideActionText value="false"/>
-                  <text value="Choose Color..."/>
-                </properties>
-              </component>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <hspacer id="395b0">
+                    <constraints>
+                      <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="0.0" weighty="0.0"/>
+                    </constraints>
+                  </hspacer>
+                  <component id="19b9c" class="javax.swing.JButton" binding="chooseColorFontButton">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="0.0" weighty="0.0"/>
+                    </constraints>
+                    <properties>
+                      <text value="Choose Color..."/>
+                    </properties>
+                  </component>
+                  <component id="d9b3" class="javax.swing.JTextPane" binding="fontColorTextPane">
+                    <constraints>
+                      <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                        <preferred-size width="150" height="50"/>
+                      </grid>
+                      <gridbag weightx="0.0" weighty="0.0" ipadx="15" ipady="3"/>
+                    </constraints>
+                    <properties>
+                      <editable value="false"/>
+                      <toolTipText value="Current font color"/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
+              <grid id="b4866" layout-manager="GridBagLayout">
+                <constraints>
+                  <grid row="6" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <hspacer id="1a7ed">
+                    <constraints>
+                      <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="0.0" weighty="0.0"/>
+                    </constraints>
+                  </hspacer>
+                  <component id="7663a" class="javax.swing.JTextPane" binding="backgroundColorTextPane">
+                    <constraints>
+                      <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                        <preferred-size width="150" height="50"/>
+                      </grid>
+                      <gridbag weightx="0.0" weighty="0.0" ipadx="15" ipady="3"/>
+                    </constraints>
+                    <properties>
+                      <editable value="false"/>
+                      <toolTipText value="Current background color"/>
+                    </properties>
+                  </component>
+                  <component id="721f9" class="javax.swing.JButton" binding="chooseColorBackgroundButton">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="0.0" weighty="0.0"/>
+                    </constraints>
+                    <properties>
+                      <hideActionText value="false"/>
+                      <text value="Choose Color..."/>
+                    </properties>
+                  </component>
+                </children>
+              </grid>
             </children>
           </grid>
           <grid id="57530" layout-manager="BorderLayout" hgap="0" vgap="0">
@@ -138,13 +194,19 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="6b146" class="javax.swing.JTextPane" binding="theQuickBrownFoxTextPane" default-binding="true">
+              <scrollpane id="c10bb">
                 <constraints border-constraint="Center"/>
-                <properties>
-                  <editable value="false"/>
-                  <text value="The quick brown fox..."/>
-                </properties>
-              </component>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <component id="8ffec" class="javax.swing.JTextPane" binding="theQuickBrownFoxTextPane" default-binding="true">
+                    <constraints/>
+                    <properties>
+                      <text value="The quick brown fox.."/>
+                    </properties>
+                  </component>
+                </children>
+              </scrollpane>
             </children>
           </grid>
         </children>
